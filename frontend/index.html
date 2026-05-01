@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>日本語 の Web</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <span class="logo-ja">日本語</span>
+    <span class="logo-sub">no Web</span>
+  </div>
+
+  <nav class="sidenav">
+    <a href="#" class="nav-item active" data-section="dashboard">
+      <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+      Обзор
+    </a>
+    <a href="#" class="nav-item" data-section="words">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+      Слова
+    </a>
+    <a href="#" class="nav-item" data-section="kanji">
+      <svg viewBox="0 0 24 24"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm7 3l-5 9h10L12 6z"/></svg>
+      Кандзи
+    </a>
+    <a href="#" class="nav-item" data-section="rules">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8L14 2zm4 18H6V4h7v5h5v11z"/></svg>
+      Грамматика
+    </a>
+    <a href="#" class="nav-item" data-section="import">
+      <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      Импорт
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="/docs" target="_blank" class="api-link">API Docs ↗</a>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════════════════════ -->
+<div class="layout">
+
+  <header class="topbar">
+    <button class="burger" id="burger" aria-label="menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="topbar-title" id="topbar-title">Обзор</div>
+    <div class="topbar-right">
+      <button class="btn-icon" id="add-btn" title="Добавить">
+        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Dashboard ──────────────────────────────────────────────────────── -->
+  <section class="page active" id="sec-dashboard">
+    <div class="page-content">
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card" data-section="words">
+          <div class="stat-icon words-icon">語</div>
+          <div class="stat-body">
+            <div class="stat-num" id="stat-words">—</div>
+            <div class="stat-label">Слов изучено</div>
+          </div>
+        </div>
+        <div class="stat-card" data-section="kanji">
+          <div class="stat-icon kanji-icon">字</div>
+          <div class="stat-body">
+            <div class="stat-num" id="stat-kanji">—</div>
+            <div class="stat-label">Кандзи</div>
+          </div>
+        </div>
+        <div class="stat-card" data-section="rules">
+          <div class="stat-icon rules-icon">文</div>
+          <div class="stat-body">
+            <div class="stat-num" id="stat-rules">—</div>
+            <div class="stat-label">Правил грамматики</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="jlpt-grid" id="jlpt-grid">
+        <h2 class="section-title">По уровню JLPT</h2>
+        <div class="jlpt-bars" id="jlpt-bars"></div>
+      </div>
+
+      <div class="recent-block">
+        <h2 class="section-title">Последние слова</h2>
+        <div class="word-cards" id="recent-words"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Words ──────────────────────────────────────────────────────────── -->
+  <section class="page" id="sec-words">
+    <div class="page-content">
+      <div class="toolbar">
+        <input class="search-input" id="words-search" placeholder="Поиск: 水, voda, вода…"/>
+        <select class="filter-sel" id="words-jlpt-filter">
+          <option value="">Все уровни</option>
+          <option value="5">N5</option><option value="4">N4</option>
+          <option value="3">N3</option><option value="2">N2</option><option value="1">N1</option>
+        </select>
+        <button class="btn-primary" id="words-load">Поиск</button>
+      </div>
+      <div class="word-cards" id="words-grid"></div>
+      <div class="pagination" id="words-pagination"></div>
+    </div>
+  </section>
+
+  <!-- ── Kanji ──────────────────────────────────────────────────────────── -->
+  <section class="page" id="sec-kanji">
+    <div class="page-content">
+      <div class="toolbar">
+        <select class="filter-sel" id="kanji-jlpt-filter">
+          <option value="">Все уровни</option>
+          <option value="5">N5</option><option value="4">N4</option>
+          <option value="3">N3</option><option value="2">N2</option><option value="1">N1</option>
+        </select>
+        <button class="btn-primary" id="kanji-load">Загрузить</button>
+      </div>
+      <div class="kanji-grid" id="kanji-grid"></div>
+    </div>
+  </section>
+
+  <!-- ── Rules ──────────────────────────────────────────────────────────── -->
+  <section class="page" id="sec-rules">
+    <div class="page-content">
+      <div class="toolbar">
+        <select class="filter-sel" id="rules-jlpt-filter">
+          <option value="">Все уровни</option>
+          <option value="5">N5</option><option value="4">N4</option>
+          <option value="3">N3</option><option value="2">N2</option><option value="1">N1</option>
+        </select>
+        <button class="btn-primary" id="rules-load">Загрузить</button>
+      </div>
+      <div id="rules-list"></div>
+    </div>
+  </section>
+
+  <!-- ── Import ─────────────────────────────────────────────────────────── -->
+  <section class="page" id="sec-import">
+    <div class="page-content">
+      <div class="import-panel">
+        <h2 class="section-title">Пакетный импорт слов</h2>
+        <p class="hint">Одно слово на строку, поля через <code>|</code>:</p>
+        <code class="hint-code">слово | чтение | романдзи | перевод | пример | JLPT | тег1,тег2</code>
+        <textarea class="import-area" id="words-import-area" rows="8"
+          placeholder="水 | みず | mizu | вода | 水を飲む | 5 | существительное
+食べる | たべる | taberu | есть | ご飯を食べる | 5 | глагол"></textarea>
+        <div class="import-actions">
+          <button class="btn-primary" id="words-import-btn">Импортировать слова</button>
+          <span class="import-status" id="words-import-status"></span>
+        </div>
+      </div>
+
+      <div class="import-panel">
+        <h2 class="section-title">Пакетный импорт кандзи</h2>
+        <p class="hint">Один символ на строку:</p>
+        <code class="hint-code">символ | онъёми1,онъёми2 | кунъёми | значение | JLPT</code>
+        <textarea class="import-area" id="kanji-import-area" rows="6"
+          placeholder="水 | スイ | みず | вода | 5
+山 | サン,ザン | やま | гора | 5"></textarea>
+        <div class="import-actions">
+          <button class="btn-primary" id="kanji-import-btn">Импортировать кандзи</button>
+          <span class="import-status" id="kanji-import-status"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /layout -->
+
+<!-- ══ ADD MODAL ═════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Добавить слово</h3>
+      <button class="modal-close" id="modal-close">✕</button>
+    </div>
+
+    <!-- Word form -->
+    <form id="word-form" class="modal-form">
+      <div class="form-row">
+        <label>Слово *<input name="word" required placeholder="水"/></label>
+        <label>Чтение<input name="reading" placeholder="みず"/></label>
+      </div>
+      <div class="form-row">
+        <label>Романдзи<input name="romanji" placeholder="mizu"/></label>
+        <label>Перевод *<input name="translation" required placeholder="вода"/></label>
+      </div>
+      <label>Пример<input name="example_sentence" placeholder="水を飲む — пить воду"/></label>
+      <div class="form-row">
+        <label>JLPT<select name="jlpt_level">
+          <option value="">—</option>
+          <option>5</option><option>4</option><option>3</option><option>2</option><option>1</option>
+        </select></label>
+        <label>Теги<input name="tags" placeholder="глагол, природа"/></label>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn-primary">Добавить</button>
+        <span class="form-status" id="word-form-status"></span>
+      </div>
+    </form>
+
+    <!-- Kanji form -->
+    <form id="kanji-form" class="modal-form hidden">
+      <div class="form-row">
+        <label>Символ *<input name="character" required placeholder="水" maxlength="2"/></label>
+        <label>Значение *<input name="meaning" required placeholder="вода"/></label>
+      </div>
+      <div class="form-row">
+        <label>Онъёми<input name="onyomi" placeholder="スイ"/></label>
+        <label>Кунъёми<input name="kunyomi" placeholder="みず"/></label>
+      </div>
+      <label>JLPT<select name="jlpt_level">
+        <option value="">—</option>
+        <option>5</option><option>4</option><option>3</option><option>2</option><option>1</option>
+      </select></label>
+      <div class="modal-footer">
+        <button type="submit" class="btn-primary">Добавить</button>
+        <span class="form-status" id="kanji-form-status"></span>
+      </div>
+    </form>
+
+    <!-- Rule form -->
+    <form id="rule-form" class="modal-form hidden">
+      <label>Заголовок *<input name="title" required placeholder="て-форма глагола"/></label>
+      <label>Объяснение *<textarea name="body" rows="4" required placeholder="て-форма образуется..."></textarea></label>
+      <div class="form-row">
+        <label>Категория<input name="category" placeholder="глагол"/></label>
+        <label>JLPT<select name="jlpt_level">
+          <option value="">—</option>
+          <option>5</option><option>4</option><option>3</option><option>2</option><option>1</option>
+        </select></label>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn-primary">Добавить</button>
+        <span class="form-status" id="rule-form-status"></span>
+      </div>
+    </form>
+
+    <!-- Tabs inside modal to switch form type -->
+    <div class="modal-type-tabs">
+      <button class="mtype active" data-form="word">Слово</button>
+      <button class="mtype" data-form="kanji">Кандзи</button>
+      <button class="mtype" data-form="rule">Правило</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

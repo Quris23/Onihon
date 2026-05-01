@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Rename-Item -Path \"D:\\\\IT\\\\Project\\\\Nihongo no Web\" -NewName \"Nihongo_no_Web\")",
+      "Bash(\"D:/PR/python files/python.exe\" data/import_nouns.py)",
+      "Bash('D:/PR/python files/python.exe' -c ' *)",
+      "Skill(claude-api)",
+      "Skill(claude-api:*)"
+    ]
+  }
+}
