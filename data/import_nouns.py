@@ -1,7 +1,10 @@
 """
 Импорт слов из noun.txt прямо в nihongo.db.
-Запуск: python data/import_nouns.py
+Запуск: python data/import_nouns.py [--clear]
+
+  --clear   удалить все слова из таблицы перед импортом
 """
+import argparse
 import re
 import sqlite3
 import pathlib
@@ -70,8 +73,18 @@ def parse(raw: str):
 
 # ── Основной импорт ───────────────────────────────────────────────────────────
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--clear", action="store_true",
+                        help="Delete all words before importing")
+    args = parser.parse_args()
+
     con = sqlite3.connect(DB)
     con.executescript(SCHEMA)
+
+    if args.clear:
+        deleted = con.execute("DELETE FROM words").rowcount
+        con.commit()
+        print(f"Cleared {deleted} existing words.")
 
     with open(TXT, encoding="utf-8") as f:
         lines = f.readlines()
@@ -91,13 +104,12 @@ def main():
         except sqlite3.IntegrityError:
             dup += 1
         except Exception as e:
-            print(f"  [skip] {w['word']}: {e}")
             skip += 1
 
     con.commit()
     con.close()
-    print(f"\nГотово: добавлено {ok}, дублей пропущено {dup}, ошибок {skip}")
-    print(f"База: {DB}")
+    print(f"Done: added={ok}, dupes={dup}, errors={skip}")
+    print(f"DB: {DB}")
 
 
 if __name__ == "__main__":

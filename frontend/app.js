@@ -126,9 +126,15 @@ const WORDS_PER_PAGE = 24;
 async function loadWords(offset = 0) {
   wordsOffset = offset;
   const jlpt   = document.getElementById("words-jlpt-filter").value;
+  const wtype  = document.getElementById("words-type-filter").value;
+  const wsub   = document.getElementById("words-sub-filter").value;
+  const wfreq  = document.getElementById("words-freq-filter")?.value ?? "";
   const search = document.getElementById("words-search").value.trim();
   let url = `/words/?limit=${WORDS_PER_PAGE}&offset=${offset}`;
   if (jlpt)   url += `&jlpt_level=${jlpt}`;
+  if (wtype)  url += `&word_type=${encodeURIComponent(wtype)}`;
+  if (wsub)   url += `&subcategory=${encodeURIComponent(wsub)}`;
+  if (wfreq)  url += `&frequency=${encodeURIComponent(wfreq)}`;
   if (search) url += `&search=${encodeURIComponent(search)}`;
   try {
     const data = await api(url);
@@ -143,17 +149,80 @@ async function loadWords(offset = 0) {
   }
 }
 
+// ── Справочники меток ─────────────────────────────────────────────────────────
+const TYPE_LABELS = {
+  "noun":"сущ.", "verb":"глаг.", "i_adj":"い-прил.", "na_adj":"な-прил.",
+  "adverb":"нар.", "expression":"выр.", "particle":"частица",
+  "conjunction":"союз", "counter":"счётн.", "pronoun":"мест.",
+  // старые варианты с дефисом (обратная совместимость)
+  "i-adj":"い-прил.", "na-adj":"な-прил.",
+};
+const SUB_LABELS = {
+  "place":"место","food":"еда","drink":"напиток","person":"человек",
+  "family":"семья","time":"время","weather":"погода","nature":"природа",
+  "object":"предмет","body":"тело","abstract":"абстр.","transport":"транспорт",
+  "building":"здание","clothing":"одежда","money":"деньги","animal":"животное",
+  "plant":"растение","number":"число","color":"цвет","direction":"направление",
+  "emotion":"эмоция","work":"работа",
+  // verb subcategories
+  "motion":"движение","state":"состояние","action":"действие","speech":"речь",
+  "perception":"восприятие","giving_receiving":"давать/получать",
+  "existence":"существование","change":"изменение","creation":"создание",
+  // adj subcategories
+  "size":"размер","character":"характер","appearance":"внешность",
+  "evaluation":"оценка","quantity":"количество","physical":"физич.",
+};
+const FREQ_LABELS = {
+  "very_common":"★★★", "common":"★★", "uncommon":"★", "rare":"редк.", "specialized":"спец.",
+};
+const FREQ_CLASS = {
+  "very_common":"badge-freq-high", "common":"badge-freq-med",
+  "uncommon":"badge-freq-low", "rare":"badge-freq-low", "specialized":"badge-freq-low",
+};
+const REGISTER_LABELS = {
+  "polite":"вежл.", "neutral":"нейтр.", "casual":"разг.", "rough":"груб.",
+  "written":"письм.", "feminine":"жен.", "masculine":"муж.",
+};
+const CONTEXT_LABELS = {
+  "daily":"быт","work":"работа","travel":"путеш.","food":"еда",
+  "anime":"аниме","news":"новости","letters":"письма","academic":"наука",
+};
+
+function typeBadgeClass(t) {
+  if (!t) return "badge-other";
+  if (t === "noun")                          return "badge-noun";
+  if (t === "verb")                          return "badge-verb";
+  if (t === "i_adj" || t === "na_adj" || t === "i-adj" || t === "na-adj") return "badge-adj";
+  if (t === "adverb")                        return "badge-adverb";
+  if (t === "expression")                    return "badge-expression";
+  return "badge-other";
+}
+
 function renderWordCard(w) {
+  _wCache[w.id] = w;
+  const jlpt      = w.jlpt_level ? `<span class="badge badge-jlpt">N${w.jlpt_level}</span>` : "";
+  const typeBadge = w.word_type
+    ? `<span class="badge ${typeBadgeClass(w.word_type)}">${esc(TYPE_LABELS[w.word_type] ?? w.word_type)}</span>`
+    : "";
+  const freqBadge = w.frequency
+    ? `<span class="badge ${FREQ_CLASS[w.frequency] ?? 'badge-other'}">${esc(FREQ_LABELS[w.frequency] ?? w.frequency)}</span>`
+    : "";
+  const subBadge  = w.subcategory
+    ? `<span class="badge badge-sub">${esc(SUB_LABELS[w.subcategory] ?? w.subcategory)}</span>`
+    : "";
   const tags = (w.tags ?? []).map(t => `<span class="badge badge-tag">${esc(t)}</span>`).join("");
-  const jlpt = w.jlpt_level ? `<span class="badge badge-jlpt">N${w.jlpt_level}</span>` : "";
-  return `<div class="word-card">
+  const descSnippet = w.description
+    ? `<div class="wc-desc">${esc(w.description.length > 72 ? w.description.slice(0, 70) + "…" : w.description)}</div>`
+    : "";
+  return `<div class="word-card" data-wid="${w.id}">
     <button class="wc-del" data-id="${w.id}" title="Удалить">✕</button>
     <div class="wc-word">${esc(w.word)}</div>
-    ${w.reading  ? `<div class="wc-reading">${esc(w.reading)}</div>` : ""}
-    ${w.romanji  ? `<div class="wc-romanji">${esc(w.romanji)}</div>` : ""}
+    ${w.reading ? `<div class="wc-reading">${esc(w.reading)}</div>` : ""}
+    ${w.romanji ? `<div class="wc-romanji">${esc(w.romanji)}</div>` : ""}
     <div class="wc-translation">${esc(w.translation)}</div>
+    ${descSnippet}
     ${w.example_sentence ? `<div class="wc-example">${esc(w.example_sentence)}</div>` : ""}
-    <div class="wc-footer">${jlpt}${tags}</div>
+    <div class="wc-footer">${jlpt}${typeBadge}${freqBadge}${subBadge}${tags}</div>
   </div>`;
 }
 
@@ -171,6 +240,10 @@ document.getElementById("words-load").addEventListener("click", () => loadWords(
 document.getElementById("words-search").addEventListener("keydown", e => {
   if (e.key === "Enter") loadWords(0);
 });
+document.getElementById("words-jlpt-filter").addEventListener("change", () => loadWords(0));
+document.getElementById("words-type-filter").addEventListener("change", () => loadWords(0));
+document.getElementById("words-sub-filter").addEventListener("change",  () => loadWords(0));
+document.getElementById("words-freq-filter")?.addEventListener("change", () => loadWords(0));
 
 /* ═══════════════════════════════════════════════════════════
    Kanji
@@ -192,10 +265,11 @@ async function loadKanji(offset = 0) {
 }
 
 function renderKanjiCard(k) {
+  _kCache[k.id] = k;
   const on  = k.onyomi?.join("、") ?? "";
   const kun = k.kunyomi?.join("、") ?? "";
   const jlpt = k.jlpt_level ? `<span class="badge badge-jlpt">N${k.jlpt_level}</span>` : "";
-  return `<div class="kanji-card">
+  return `<div class="kanji-card" data-kid="${k.id}">
     <button class="kc-del" data-id="${k.id}" title="Удалить">✕</button>
     <div class="kc-char">${esc(k.character)}</div>
     <div class="kc-meaning">${esc(k.meaning)}</div>
@@ -230,15 +304,18 @@ async function loadRules() {
     const data = await api(url);
     const list = document.getElementById("rules-list");
     list.innerHTML = data.length
-      ? data.map(r => `<div class="rule-card">
-          <button class="rc-del" data-id="${r.id}" title="Удалить">✕</button>
-          <div class="rc-title">${esc(r.title)}</div>
-          <div class="rc-body">${esc(r.body)}</div>
-          <div class="rc-footer">
-            ${r.jlpt_level ? `<span class="badge badge-jlpt">N${r.jlpt_level}</span>` : ""}
-            ${r.category   ? `<span class="badge">${esc(r.category)}</span>` : ""}
-          </div>
-        </div>`).join("")
+      ? data.map(r => {
+          _rCache[r.id] = r;
+          return `<div class="rule-card" data-rid="${r.id}">
+            <button class="rc-del" data-id="${r.id}" title="Удалить">✕</button>
+            <div class="rc-title">${esc(r.title)}</div>
+            <div class="rc-body">${esc(r.body)}</div>
+            <div class="rc-footer">
+              ${r.jlpt_level ? `<span class="badge badge-jlpt">N${r.jlpt_level}</span>` : ""}
+              ${r.category   ? `<span class="badge">${esc(r.category)}</span>` : ""}
+            </div>
+          </div>`;
+        }).join("")
       : `<p class="empty">Правил не найдено</p>`;
     list.querySelectorAll(".rc-del").forEach(btn =>
       btn.addEventListener("click", async () => {
@@ -311,6 +388,8 @@ document.getElementById("word-form").addEventListener("submit", async e => {
       word: fd.word, reading: fd.reading||null, romanji: fd.romanji||null,
       translation: fd.translation, example_sentence: fd.example_sentence||null,
       jlpt_level: intOrNull(fd.jlpt_level), tags: parseTags(fd.tags),
+      word_type:   fd.word_type   || null,
+      verb_group:  fd.verb_group  || null,
     });
     setFormStatus(st, "✓ Добавлено!", true);
     e.target.reset();
@@ -405,6 +484,116 @@ document.getElementById("kanji-import-btn").addEventListener("click", async () =
     setStatus(st, `✓ Добавлено ${res.length} кандзи`, true);
     document.getElementById("kanji-import-area").value = "";
   } catch(e) { setStatus(st, e.message, false); }
+});
+
+/* ═══════════════════════════════════════════════════════════
+   Detail modal — глобальный кэш и рендер
+═══════════════════════════════════════════════════════════ */
+const _wCache = {};
+const _kCache = {};
+const _rCache = {};
+
+const VGROUP_LABELS = { "1": "1-я группа (五段)", "2": "2-я группа (一段)", "3": "3-я (нерег.)" };
+
+function renderWordDetail(w) {
+  const metaItems = [];
+  if (w.jlpt_level)     metaItems.push({ label: "JLPT",       value: `N${w.jlpt_level}` });
+  if (w.word_type)      metaItems.push({ label: "Тип",        value: TYPE_LABELS[w.word_type] ?? w.word_type });
+  if (w.subcategory)    metaItems.push({ label: "Подтип",     value: SUB_LABELS[w.subcategory] ?? w.subcategory });
+  if (w.verb_group)     metaItems.push({ label: "Группа",     value: VGROUP_LABELS[w.verb_group] ?? w.verb_group });
+  if (w.speech_register) metaItems.push({ label: "Стиль",    value: REGISTER_LABELS[w.speech_register] ?? w.speech_register });
+  if (w.frequency)      metaItems.push({ label: "Частотность", value: FREQ_LABELS[w.frequency] ?? w.frequency });
+  if (w.te_form)        metaItems.push({ label: "て-форма",   value: w.te_form });
+  if (w.is_transitive != null) metaItems.push({ label: "Переходность", value: w.is_transitive ? "переходный" : "непереходный" });
+  if (w.can_suru != null)      metaItems.push({ label: "する-глагол",  value: w.can_suru ? "да" : "нет" });
+  if (w.counter_suffix) metaItems.push({ label: "Счётный суф.", value: w.counter_suffix });
+
+  const meta = metaItems.map(m =>
+    `<div class="dc-meta-item">
+       <div class="dc-meta-label">${m.label}</div>
+       <div class="dc-meta-value">${esc(m.value)}</div>
+     </div>`
+  ).join("");
+
+  const contextBadges = (w.context ?? [])
+    .map(c => `<span class="badge badge-tag">${esc(CONTEXT_LABELS[c] ?? c)}</span>`).join("");
+  const allTags = (w.tags ?? []).map(t => `<span class="badge badge-tag">${esc(t)}</span>`).join("");
+
+  return `
+    <div class="dc-word">${esc(w.word)}</div>
+    ${w.reading  ? `<div class="dc-reading">${esc(w.reading)}</div>` : ""}
+    ${w.romanji  ? `<div class="dc-romanji">${esc(w.romanji)}</div>` : ""}
+    <div class="dc-translation">${esc(w.translation)}</div>
+    ${w.description ? `<div class="dc-description">${esc(w.description)}</div>` : ""}
+    ${w.example_sentence ? `<div class="dc-example">${esc(w.example_sentence)}</div>` : ""}
+    ${meta ? `<div class="dc-meta">${meta}</div>` : ""}
+    ${contextBadges ? `<div class="dc-badges">${contextBadges}</div>` : ""}
+    ${allTags ? `<div class="dc-badges" style="margin-top:6px">${allTags}</div>` : ""}`;
+}
+
+function renderKanjiDetail(k) {
+  const on  = k.onyomi?.join("  ") ?? "";
+  const kun = k.kunyomi?.join("  ") ?? "";
+  const jlpt = k.jlpt_level ? `<span class="badge badge-jlpt">N${k.jlpt_level}</span>` : "";
+  return `
+    <div class="dc-kanji">${esc(k.character)}</div>
+    <div class="dc-kanji-meaning">${esc(k.meaning)}</div>
+    <div class="dc-kanji-readings">
+      ${on  ? `<div class="dc-reading-block"><div class="dc-meta-label">Онъёми 音読み</div><div class="dc-meta-value">${esc(on)}</div></div>` : ""}
+      ${kun ? `<div class="dc-reading-block"><div class="dc-meta-label">Кунъёми 訓読み</div><div class="dc-meta-value">${esc(kun)}</div></div>` : ""}
+    </div>
+    ${jlpt ? `<div class="dc-badges">${jlpt}</div>` : ""}`;
+}
+
+function renderRuleDetail(r) {
+  const jlpt = r.jlpt_level ? `<span class="badge badge-jlpt">N${r.jlpt_level}</span>` : "";
+  const cat  = r.category   ? `<span class="badge">${esc(r.category)}</span>` : "";
+  return `
+    <div class="dc-rule-title">${esc(r.title)}</div>
+    <div class="dc-rule-body">${esc(r.body)}</div>
+    ${(jlpt || cat) ? `<div class="dc-badges">${jlpt}${cat}</div>` : ""}`;
+}
+
+function openDetail(html) {
+  document.getElementById("detail-content").innerHTML = html;
+  document.getElementById("detail-overlay").classList.add("open");
+}
+
+function closeDetail() {
+  document.getElementById("detail-overlay").classList.remove("open");
+}
+
+// Закрытие детал-модалки
+document.getElementById("detail-close").addEventListener("click", closeDetail);
+document.getElementById("detail-overlay").addEventListener("click", e => {
+  if (e.target === document.getElementById("detail-overlay")) closeDetail();
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeDetail();
+});
+
+// Делегирование кликов на карточки
+document.addEventListener("click", e => {
+  const wcard = e.target.closest(".word-card");
+  if (wcard && !e.target.closest(".wc-del")) {
+    const id = +wcard.dataset.wid;
+    const w = _wCache[id];
+    if (w) openDetail(renderWordDetail(w));
+    return;
+  }
+  const kcard = e.target.closest(".kanji-card");
+  if (kcard && !e.target.closest(".kc-del")) {
+    const id = +kcard.dataset.kid;
+    const k = _kCache[id];
+    if (k) openDetail(renderKanjiDetail(k));
+    return;
+  }
+  const rcard = e.target.closest(".rule-card");
+  if (rcard && !e.target.closest(".rc-del")) {
+    const id = +rcard.dataset.rid;
+    const r = _rCache[id];
+    if (r) openDetail(renderRuleDetail(r));
+  }
 });
 
 /* ═══════════════════════════════════════════════════════════

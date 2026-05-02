@@ -6,7 +6,7 @@
   <title>日本語 の Web</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="/static/style.css"/>
+  <link rel="stylesheet" href="/static/style.css?v=3"/>
 </head>
 <body>
 
@@ -109,6 +109,53 @@
           <option value="5">N5</option><option value="4">N4</option>
           <option value="3">N3</option><option value="2">N2</option><option value="1">N1</option>
         </select>
+        <select class="filter-sel" id="words-type-filter">
+          <option value="">Все типы</option>
+          <option value="noun">Существительное</option>
+          <option value="verb">Глагол</option>
+          <option value="i_adj">い-прилагательное</option>
+          <option value="na_adj">な-прилагательное</option>
+          <option value="adverb">Наречие</option>
+          <option value="expression">Выражение</option>
+          <option value="particle">Частица</option>
+          <option value="conjunction">Союз</option>
+          <option value="counter">Счётное</option>
+          <option value="pronoun">Местоимение</option>
+        </select>
+        <select class="filter-sel" id="words-sub-filter">
+          <option value="">Все подтипы</option>
+          <option value="place">Место</option>
+          <option value="food">Еда</option>
+          <option value="drink">Напиток</option>
+          <option value="person">Человек</option>
+          <option value="family">Семья</option>
+          <option value="time">Время</option>
+          <option value="weather">Погода</option>
+          <option value="nature">Природа</option>
+          <option value="object">Предмет</option>
+          <option value="body">Тело</option>
+          <option value="abstract">Абстракция</option>
+          <option value="transport">Транспорт</option>
+          <option value="building">Здание</option>
+          <option value="clothing">Одежда</option>
+          <option value="animal">Животное</option>
+          <option value="color">Цвет</option>
+          <option value="emotion">Эмоция</option>
+          <option value="work">Работа</option>
+          <option value="money">Деньги</option>
+          <option value="direction">Направление</option>
+          <option value="action">Действие</option>
+          <option value="motion">Движение</option>
+          <option value="state">Состояние</option>
+        </select>
+        <select class="filter-sel" id="words-freq-filter">
+          <option value="">Любая частотность</option>
+          <option value="very_common">★★★ Очень частое</option>
+          <option value="common">★★ Частое</option>
+          <option value="uncommon">★ Редкое</option>
+          <option value="rare">Очень редкое</option>
+          <option value="specialized">Специальное</option>
+        </select>
         <button class="btn-primary" id="words-load">Поиск</button>
       </div>
       <div class="word-cards" id="words-grid"></div>
@@ -203,7 +250,28 @@
           <option value="">—</option>
           <option>5</option><option>4</option><option>3</option><option>2</option><option>1</option>
         </select></label>
-        <label>Теги<input name="tags" placeholder="глагол, природа"/></label>
+        <label>Теги<input name="tags" placeholder="природа, N5"/></label>
+      </div>
+      <div class="form-row">
+        <label>Тип слова<select name="word_type">
+          <option value="">—</option>
+          <option value="noun">Существительное</option>
+          <option value="verb">Глагол</option>
+          <option value="i_adj">い-прилагательное</option>
+          <option value="na_adj">な-прилагательное</option>
+          <option value="adverb">Наречие</option>
+          <option value="expression">Выражение</option>
+          <option value="particle">Частица</option>
+          <option value="conjunction">Союз</option>
+          <option value="counter">Счётное слово</option>
+          <option value="pronoun">Местоимение</option>
+        </select></label>
+        <label>Группа глагола<select name="verb_group">
+          <option value="">—</option>
+          <option value="1">1 (五段 / godan)</option>
+          <option value="2">2 (一段 / ichidan)</option>
+          <option value="3">3 (irregular)</option>
+        </select></label>
       </div>
       <div class="modal-footer">
         <button type="submit" class="btn-primary">Добавить</button>
@@ -257,6 +325,14 @@
   </div>
 </div>
 
-<script src="/static/app.js"></script>
+<!-- ══ DETAIL MODAL ══════════════════════════════════════════════════════════ -->
+<div class="detail-overlay" id="detail-overlay">
+  <div class="detail-card" id="detail-card">
+    <button class="detail-close" id="detail-close" aria-label="Закрыть">✕</button>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<script src="/static/app.js?v=3"></script>
 </body>
 </html>

@@ -22,6 +22,21 @@ class WordIn(BaseModel):
     example_sentence: Optional[str] = None
     jlpt_level:       Optional[int] = Field(None, ge=1, le=5)
     tags:             list[str]     = []
+    # Классификация
+    word_type:        Optional[str] = None
+    subcategory:      Optional[str] = None
+    verb_group:       Optional[str] = None
+    speech_register:  Optional[str] = None
+    description:      Optional[str] = None
+    frequency:        Optional[str] = None
+    context:          list[str]     = []
+    # Детали глагола
+    is_transitive:    Optional[bool] = None
+    te_form:          Optional[str]  = None
+    verb_subtype:     Optional[str]  = None
+    # Детали существительного
+    can_suru:         Optional[bool] = None
+    counter_suffix:   Optional[str]  = None
 
 
 class WordOut(BaseModel):
@@ -33,6 +48,18 @@ class WordOut(BaseModel):
     example_sentence: Optional[str]
     jlpt_level:       Optional[int]
     tags:             list[str]
+    word_type:        Optional[str]
+    subcategory:      Optional[str]
+    verb_group:       Optional[str]
+    speech_register:  Optional[str]
+    description:      Optional[str]
+    frequency:        Optional[str]
+    context:          list[str]
+    is_transitive:    Optional[bool]
+    te_form:          Optional[str]
+    verb_subtype:     Optional[str]
+    can_suru:         Optional[bool]
+    counter_suffix:   Optional[str]
     created_at:       str
 
 
