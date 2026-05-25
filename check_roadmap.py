@@ -1,7 +1,7 @@
 import sqlite3, re, sys
 sys.stdout.reconfigure(encoding="utf-8")
 
-with open("frontend/roadmap-data.js", encoding="utf-8") as f:
+with open("docs/roadmap-data.js", encoding="utf-8") as f:
     content = f.read()
 
 words_raw = re.findall(r'\{\s*jp:\s*"([^"]+)",\s*ru:\s*"([^"]+)"\s*\}', content)

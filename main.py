@@ -20,7 +20,7 @@ app.include_router(words.router,  prefix="/api")
 app.include_router(kanji.router,  prefix="/api")
 app.include_router(rules.router,  prefix="/api")
 
-_fe = pathlib.Path(__file__).parent / "frontend"
+_fe = pathlib.Path(__file__).parent / "docs"
 app.mount("/static", StaticFiles(directory=str(_fe)), name="static")
 
 
