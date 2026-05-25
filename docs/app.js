@@ -1,5 +1,7 @@
 ﻿"use strict";
-const API = "/api";
+const API = location.hostname === "quris23.github.io"
+  ? "https://onihon.onrender.com/api"
+  : "/api";
 
 // ── Sakura petals ────────────────────────────────────────────
 (function() {
