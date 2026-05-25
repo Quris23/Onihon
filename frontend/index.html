@@ -1,47 +1,64 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>日本語 の Web</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="/static/style.css?v=3"/>
+  <link rel="stylesheet" href="/static/style.css?v=42"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 </head>
 <body>
+<div class="sakura-layer" id="sakura-layer"></div>
 
 <!-- ══ SIDEBAR ══════════════════════════════════════════════════════════════ -->
 <aside class="sidebar" id="sidebar">
   <div class="logo">
-    <span class="logo-ja">日本語</span>
-    <span class="logo-sub">no Web</span>
+    <div class="logo-text">
+      <span class="logo-ja">鬼本</span>
+      <span class="logo-sub">no web</span>
+    </div>
+    <span class="logo-ja-mini">鬼</span>
+    <button class="sidebar-toggle" id="sidebar-toggle" title="Свернуть">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+        <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+      </svg>
+    </button>
   </div>
-
   <nav class="sidenav">
     <a href="#" class="nav-item active" data-section="dashboard">
-      <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-      Обзор
+      <span class="nav-kanji">概</span>
+      <span class="nav-item-label">Обзор</span>
+      <span class="nav-active-dot"></span>
     </a>
     <a href="#" class="nav-item" data-section="words">
-      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
-      Слова
+      <span class="nav-kanji">語</span>
+      <span class="nav-item-label">Слова</span>
+      <span class="nav-active-dot"></span>
     </a>
     <a href="#" class="nav-item" data-section="kanji">
-      <svg viewBox="0 0 24 24"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm7 3l-5 9h10L12 6z"/></svg>
-      Кандзи
+      <span class="nav-kanji">字</span>
+      <span class="nav-item-label">Кандзи</span>
+      <span class="nav-active-dot"></span>
     </a>
     <a href="#" class="nav-item" data-section="rules">
-      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8L14 2zm4 18H6V4h7v5h5v11z"/></svg>
-      Грамматика
+      <span class="nav-kanji">文</span>
+      <span class="nav-item-label">Грамматика</span>
+      <span class="nav-active-dot"></span>
     </a>
-    <a href="#" class="nav-item" data-section="import">
-      <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-      Импорт
+    <a href="#" class="nav-item" data-section="roadmap">
+      <span class="nav-kanji">道</span>
+      <span class="nav-item-label">Дорожная карта</span>
+      <span class="nav-active-dot"></span>
     </a>
   </nav>
-
   <div class="sidebar-footer">
     <a href="/docs" target="_blank" class="api-link">API Docs ↗</a>
+    <div class="sidebar-footer-btns">
+      <button class="btn-theme" id="btn-theme" title="Сменить тему">☀</button>
+      <button class="btn-sakura" id="btn-sakura" title="Лепестки сакуры">🌸</button>
+    </div>
   </div>
 </aside>
 
@@ -54,6 +71,16 @@
     </button>
     <div class="topbar-title" id="topbar-title">Обзор</div>
     <div class="topbar-right">
+      <!-- Авторизованный пользователь -->
+      <div class="user-menu hidden" id="user-menu">
+        <img class="user-avatar" id="user-avatar" src="" alt=""/>
+        <span class="user-name" id="user-name"></span>
+        <button class="btn-logout" id="btn-logout" title="Выйти">
+          <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+        </button>
+      </div>
+      <!-- Не авторизован -->
+      <button class="btn-login" id="btn-login" title="Войти">Войти</button>
       <button class="btn-icon" id="add-btn" title="Добавить">
         <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
       </button>
@@ -63,100 +90,332 @@
   <!-- ── Dashboard ──────────────────────────────────────────────────────── -->
   <section class="page active" id="sec-dashboard">
     <div class="page-content">
-      <div class="stats-grid" id="stats-grid">
-        <div class="stat-card" data-section="words">
-          <div class="stat-icon words-icon">語</div>
-          <div class="stat-body">
-            <div class="stat-num" id="stat-words">—</div>
-            <div class="stat-label">Слов изучено</div>
-          </div>
+      <div class="stats-bar" id="stats-bar">
+        <div class="stat-col" data-section="words">
+          <span class="stat-ja" style="background:linear-gradient(135deg,#FFB3C1,#C8102E);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">語</span>
+          <span class="stat-num-big" id="stat-words">—</span>
+          <span class="stat-lbl">Слов в базе</span>
         </div>
-        <div class="stat-card" data-section="kanji">
-          <div class="stat-icon kanji-icon">字</div>
-          <div class="stat-body">
-            <div class="stat-num" id="stat-kanji">—</div>
-            <div class="stat-label">Кандзи</div>
-          </div>
+        <div class="stat-col" data-section="kanji">
+          <span class="stat-ja" style="background:linear-gradient(135deg,#a5b4fc,#4361ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">字</span>
+          <span class="stat-num-big" id="stat-kanji">—</span>
+          <span class="stat-lbl">Кандзи</span>
         </div>
-        <div class="stat-card" data-section="rules">
-          <div class="stat-icon rules-icon">文</div>
-          <div class="stat-body">
-            <div class="stat-num" id="stat-rules">—</div>
-            <div class="stat-label">Правил грамматики</div>
+        <div class="stat-col" data-section="rules">
+          <span class="stat-ja" style="background:linear-gradient(135deg,#d8b4fe,#9b5de5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">文</span>
+          <span class="stat-num-big" id="stat-rules">—</span>
+          <span class="stat-lbl">Правил грамматики</span>
+        </div>
+      </div>
+
+      <!-- Режимы обучения -->
+      <div>
+        <div class="sec-lbl">Режимы обучения</div>
+        <div class="modes-grid">
+          <div class="mode-card" data-mode="flashcards">
+            <span class="mode-wm">習</span>
+            <div class="mode-icon">🃏</div>
+            <div class="mode-name">Флэш Карточки</div>
+            <div class="mode-desc">Учите слова по карточкам с фильтрами по типу, уровню и статусу</div>
+          </div>
+          <div class="mode-card" data-mode="quiz">
+            <span class="mode-wm">試</span>
+            <div class="mode-icon">🎯</div>
+            <div class="mode-name">Тест</div>
+            <div class="mode-desc">Выбирайте правильный перевод из 4 вариантов — с японского и обратно</div>
           </div>
         </div>
       </div>
 
       <div class="jlpt-grid" id="jlpt-grid">
-        <h2 class="section-title">По уровню JLPT</h2>
-        <div class="jlpt-bars" id="jlpt-bars"></div>
+        <div class="sec-lbl">По уровню JLPT</div>
+        <div class="jlpt-row" id="jlpt-bars"></div>
       </div>
 
       <div class="recent-block">
-        <h2 class="section-title">Последние слова</h2>
+        <div class="sec-lbl">Последние слова</div>
         <div class="word-cards" id="recent-words"></div>
       </div>
+    </div>
+  </section>
+
+  <!-- ── Flash Cards ────────────────────────────────────────────────────── -->
+  <section class="page" id="sec-flashcards">
+    <div class="page-content">
+
+      <!-- Setup screen -->
+      <div id="fc-setup">
+        <div class="fc-topbar">
+          <button class="fc-back-btn" id="fc-back-btn">← Обзор</button>
+          <h2 class="fc-title">Флэш Карточки</h2>
+        </div>
+        <div class="fc-filters-panel">
+          <select class="filter-sel" id="fc-jlpt">
+            <option value="">Все уровни</option>
+            <option value="5">N5</option><option value="4">N4</option>
+            <option value="3">N3</option><option value="2">N2</option><option value="1">N1</option>
+          </select>
+          <select class="filter-sel" id="fc-type">
+            <option value="">Все типы</option>
+            <option value="noun">Существительное</option>
+            <option value="verb">Глагол</option>
+            <option value="i_adj">い-прилагательное</option>
+            <option value="na_adj">な-прилагательное</option>
+            <option value="adverb">Наречие</option>
+            <option value="expression">Выражение</option>
+            <option value="particle">Частица</option>
+            <option value="counter">Счётное</option>
+          </select>
+          <select class="filter-sel" id="fc-sub">
+            <option value="">Все подтипы</option>
+            <option value="place">Место</option><option value="food">Еда</option>
+            <option value="person">Человек</option><option value="family">Семья</option>
+            <option value="time">Время</option><option value="nature">Природа</option>
+            <option value="body">Тело</option><option value="emotion">Эмоция</option>
+            <option value="work">Работа</option><option value="travel">Путешествие</option>
+            <option value="motion">Движение</option><option value="action">Действие</option>
+          </select>
+          <select class="filter-sel" id="fc-prog">
+            <option value="">Все слова</option>
+            <option value="favorite">⭐ Избранное</option>
+            <option value="learned">📖 Изученные</option>
+            <option value="unlearned">📖 Неизученные</option>
+          </select>
+          <button class="btn-primary" id="fc-start-btn">▶ Начать</button>
+        </div>
+        <div class="fc-count-hint" id="fc-count-hint"></div>
+      </div>
+
+      <!-- Card view -->
+      <div id="fc-view" class="hidden">
+        <div class="fc-topbar">
+          <button class="fc-back-btn" id="fc-reset-btn">← К фильтрам</button>
+          <span class="fc-counter" id="fc-counter">1 / 20</span>
+        </div>
+
+        <div class="fc-arena">
+          <button class="fc-nav" id="fc-prev" aria-label="Предыдущая">&#8249;</button>
+
+          <div class="fc-card" id="fc-card">
+            <div class="fc-card-inner" id="fc-card-inner">
+              <div class="fc-face fc-front">
+                <div class="fc-f-jlpt" id="fc-f-jlpt"></div>
+                <div class="fc-f-word" id="fc-f-word"></div>
+                <div class="fc-f-reading" id="fc-f-reading"></div>
+                <div class="fc-f-romanji" id="fc-f-romanji"></div>
+                <div class="fc-tap-hint">Нажмите для перевода</div>
+              </div>
+              <div class="fc-face fc-back">
+                <div class="fc-b-word" id="fc-b-word"></div>
+                <div class="fc-b-translation" id="fc-b-translation"></div>
+                <div class="fc-b-desc" id="fc-b-desc"></div>
+              </div>
+            </div>
+          </div>
+
+          <button class="fc-nav" id="fc-next" aria-label="Следующая">&#8250;</button>
+        </div>
+
+        <div class="fc-buttons">
+          <button class="fc-action fc-wrong" id="fc-wrong" title="Не знаю (X)">✕</button>
+          <button class="fc-action fc-right" id="fc-right" title="Знаю — изучено (C)">✓</button>
+        </div>
+
+        <div class="fc-dots" id="fc-dots"></div>
+      </div>
+
+      <!-- Results screen -->
+      <div id="fc-results" class="hidden">
+        <div class="fc-topbar">
+          <h2 class="fc-title">Результаты</h2>
+        </div>
+        <div class="fcr-summary" id="fc-results-summary"></div>
+        <div class="fcr-list" id="fc-results-list"></div>
+        <div class="fcr-actions">
+          <button class="btn-secondary" id="fc-results-retry">🔄 Повторить</button>
+          <button class="btn-primary"   id="fc-results-home">На главную</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Quiz ─────────────────────────────────────────────────────────────── -->
+  <section class="page" id="sec-quiz">
+    <div class="page-content">
+
+      <!-- Setup -->
+      <div id="qz-setup">
+        <div class="fc-topbar">
+          <button class="fc-back-btn" id="qz-back-btn">← Обзор</button>
+          <h2 class="fc-title">Тест</h2>
+        </div>
+        <div class="fc-filters-panel">
+          <select class="filter-sel" id="qz-jlpt">
+            <option value="">Все уровни</option>
+            <option value="5">N5</option><option value="4">N4</option>
+            <option value="3">N3</option><option value="2">N2</option><option value="1">N1</option>
+          </select>
+          <select class="filter-sel" id="qz-type">
+            <option value="">Все типы</option>
+            <option value="noun">Существительное</option>
+            <option value="verb">Глагол</option>
+            <option value="i_adj">い-прилагательное</option>
+            <option value="na_adj">な-прилагательное</option>
+            <option value="adverb">Наречие</option>
+            <option value="expression">Выражение</option>
+            <option value="particle">Частица</option>
+            <option value="counter">Счётное</option>
+          </select>
+          <select class="filter-sel" id="qz-sub">
+            <option value="">Все подтипы</option>
+            <option value="place">Место</option><option value="food">Еда</option>
+            <option value="drink">Напиток</option><option value="person">Человек</option>
+            <option value="family">Семья</option><option value="time">Время</option>
+            <option value="weather">Погода</option><option value="nature">Природа</option>
+            <option value="object">Предмет</option><option value="body">Тело</option>
+            <option value="abstract">Абстракция</option><option value="transport">Транспорт</option>
+            <option value="building">Здание</option><option value="clothing">Одежда</option>
+            <option value="animal">Животное</option><option value="color">Цвет</option>
+            <option value="emotion">Эмоция</option><option value="work">Работа</option>
+            <option value="money">Деньги</option><option value="direction">Направление</option>
+            <option value="action">Действие</option><option value="motion">Движение</option>
+            <option value="state">Состояние</option><option value="travel">Путешествие</option>
+          </select>
+          <select class="filter-sel" id="qz-prog">
+            <option value="">Все слова</option>
+            <option value="favorite">⭐ Избранное</option>
+            <option value="learned">📖 Изученные</option>
+            <option value="unlearned">📖 Неизученные</option>
+          </select>
+          <select class="filter-sel" id="qz-dir">
+            <option value="jp_ru">🇯🇵 → 🇷🇺  Японский → Русский</option>
+            <option value="ru_jp">🇷🇺 → 🇯🇵  Русский → Японский</option>
+          </select>
+          <button class="btn-primary" id="qz-start-btn">▶ Начать</button>
+        </div>
+        <div class="fc-count-hint" id="qz-count-hint"></div>
+      </div>
+
+      <!-- Quiz view -->
+      <div id="qz-view" class="hidden">
+        <div class="fc-topbar">
+          <button class="fc-back-btn" id="qz-reset-btn">← К фильтрам</button>
+          <span class="fc-counter" id="qz-counter">1 / 20</span>
+        </div>
+
+        <div class="qz-question-card">
+          <div class="qz-q-label" id="qz-q-label">Как переводится?</div>
+          <div class="qz-q-word" id="qz-q-word"></div>
+          <div class="qz-q-reading" id="qz-q-reading"></div>
+        </div>
+
+        <div class="qz-choose-label">Выберите ответ</div>
+        <div class="qz-options" id="qz-options"></div>
+
+        <div class="qz-footer">
+          <button class="qz-not-sure" id="qz-not-sure">🏳 Не уверены?</button>
+        </div>
+
+        <div class="fc-dots" id="qz-dots"></div>
+      </div>
+
+      <!-- Results -->
+      <div id="qz-results" class="hidden">
+        <div class="fc-topbar">
+          <h2 class="fc-title">Результаты теста</h2>
+        </div>
+        <div class="fcr-summary" id="qz-results-summary"></div>
+        <div class="fcr-list" id="qz-results-list"></div>
+        <div class="fcr-actions">
+          <button class="btn-secondary" id="qz-results-retry">🔄 Повторить</button>
+          <button class="btn-primary"   id="qz-results-home">На главную</button>
+        </div>
+      </div>
+
     </div>
   </section>
 
   <!-- ── Words ──────────────────────────────────────────────────────────── -->
   <section class="page" id="sec-words">
     <div class="page-content">
-      <div class="toolbar">
-        <input class="search-input" id="words-search" placeholder="Поиск: 水, voda, вода…"/>
-        <select class="filter-sel" id="words-jlpt-filter">
-          <option value="">Все уровни</option>
-          <option value="5">N5</option><option value="4">N4</option>
-          <option value="3">N3</option><option value="2">N2</option><option value="1">N1</option>
-        </select>
-        <select class="filter-sel" id="words-type-filter">
-          <option value="">Все типы</option>
-          <option value="noun">Существительное</option>
-          <option value="verb">Глагол</option>
-          <option value="i_adj">い-прилагательное</option>
-          <option value="na_adj">な-прилагательное</option>
-          <option value="adverb">Наречие</option>
-          <option value="expression">Выражение</option>
-          <option value="particle">Частица</option>
-          <option value="conjunction">Союз</option>
-          <option value="counter">Счётное</option>
-          <option value="pronoun">Местоимение</option>
-        </select>
-        <select class="filter-sel" id="words-sub-filter">
-          <option value="">Все подтипы</option>
-          <option value="place">Место</option>
-          <option value="food">Еда</option>
-          <option value="drink">Напиток</option>
-          <option value="person">Человек</option>
-          <option value="family">Семья</option>
-          <option value="time">Время</option>
-          <option value="weather">Погода</option>
-          <option value="nature">Природа</option>
-          <option value="object">Предмет</option>
-          <option value="body">Тело</option>
-          <option value="abstract">Абстракция</option>
-          <option value="transport">Транспорт</option>
-          <option value="building">Здание</option>
-          <option value="clothing">Одежда</option>
-          <option value="animal">Животное</option>
-          <option value="color">Цвет</option>
-          <option value="emotion">Эмоция</option>
-          <option value="work">Работа</option>
-          <option value="money">Деньги</option>
-          <option value="direction">Направление</option>
-          <option value="action">Действие</option>
-          <option value="motion">Движение</option>
-          <option value="state">Состояние</option>
-        </select>
-        <select class="filter-sel" id="words-freq-filter">
-          <option value="">Любая частотность</option>
-          <option value="very_common">★★★ Очень частое</option>
-          <option value="common">★★ Частое</option>
-          <option value="uncommon">★ Редкое</option>
-          <option value="rare">Очень редкое</option>
-          <option value="specialized">Специальное</option>
-        </select>
-        <button class="btn-primary" id="words-load">Поиск</button>
+      <div class="filter-bar">
+        <div class="filter-row">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
+            <input class="search-field" id="words-search" placeholder="Поиск: 水, voda, вода…"/>
+          </div>
+          <select class="type-sel" id="words-type-filter">
+            <option value="">Все типы</option>
+            <option value="noun">Существительное</option>
+            <option value="verb">Глагол</option>
+            <option value="i_adj">い-прилагательное</option>
+            <option value="na_adj">な-прилагательное</option>
+            <option value="adverb">Наречие</option>
+            <option value="expression">Выражение</option>
+            <option value="particle">Частица</option>
+            <option value="conjunction">Союз</option>
+            <option value="counter">Счётное</option>
+            <option value="pronoun">Местоимение</option>
+          </select>
+          <select class="type-sel" id="words-sub-filter">
+            <option value="">Все подтипы</option>
+            <option value="place">Место</option>
+            <option value="food">Еда</option>
+            <option value="drink">Напиток</option>
+            <option value="person">Человек</option>
+            <option value="family">Семья</option>
+            <option value="time">Время</option>
+            <option value="weather">Погода</option>
+            <option value="nature">Природа</option>
+            <option value="object">Предмет</option>
+            <option value="body">Тело</option>
+            <option value="abstract">Абстракция</option>
+            <option value="transport">Транспорт</option>
+            <option value="building">Здание</option>
+            <option value="clothing">Одежда</option>
+            <option value="animal">Животное</option>
+            <option value="color">Цвет</option>
+            <option value="emotion">Эмоция</option>
+            <option value="work">Работа</option>
+            <option value="money">Деньги</option>
+            <option value="direction">Направление</option>
+            <option value="action">Действие</option>
+            <option value="motion">Движение</option>
+            <option value="state">Состояние</option>
+          </select>
+          <select class="type-sel" id="words-freq-filter">
+            <option value="">Любая частотность</option>
+            <option value="very_common">★★★ Очень частое</option>
+            <option value="common">★★ Частое</option>
+            <option value="uncommon">★ Редкое</option>
+            <option value="rare">Очень редкое</option>
+            <option value="specialized">Специальное</option>
+          </select>
+          <button class="btn-primary" id="words-load">Поиск</button>
+          <!-- hidden compat selects -->
+          <select id="words-jlpt-filter" style="display:none">
+            <option value="">Все уровни</option>
+            <option value="5">N5</option><option value="4">N4</option>
+            <option value="3">N3</option><option value="2">N2</option><option value="1">N1</option>
+          </select>
+          <select id="words-prog-filter" style="display:none">
+            <option value="">Все слова</option>
+            <option value="learned">Изучено</option>
+            <option value="favorite">Избранное</option>
+          </select>
+        </div>
+        <div class="filter-row">
+          <span class="pills-label">JLPT</span>
+          <button class="pill-btn" data-jlpt="5" id="words-pill-n5">N5</button>
+          <button class="pill-btn" data-jlpt="4" id="words-pill-n4">N4</button>
+          <button class="pill-btn" data-jlpt="3" id="words-pill-n3">N3</button>
+          <button class="pill-btn" data-jlpt="2" id="words-pill-n2">N2</button>
+          <button class="pill-btn" data-jlpt="1" id="words-pill-n1">N1</button>
+          <span class="filter-divider"></span>
+          <button class="prog-pill learned" id="words-pill-learned">📖 Изучено</button>
+          <button class="prog-pill" id="words-pill-fav">⭐ Избранное</button>
+        </div>
       </div>
       <div class="word-cards" id="words-grid"></div>
       <div class="pagination" id="words-pagination"></div>
@@ -166,61 +425,95 @@
   <!-- ── Kanji ──────────────────────────────────────────────────────────── -->
   <section class="page" id="sec-kanji">
     <div class="page-content">
-      <div class="toolbar">
-        <select class="filter-sel" id="kanji-jlpt-filter">
-          <option value="">Все уровни</option>
-          <option value="5">N5</option><option value="4">N4</option>
-          <option value="3">N3</option><option value="2">N2</option><option value="1">N1</option>
-        </select>
-        <button class="btn-primary" id="kanji-load">Загрузить</button>
+      <div class="filter-bar">
+        <div class="filter-row">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
+            <input class="search-field" id="kanji-search" placeholder="Поиск: 火, огонь, カ…"/>
+          </div>
+          <button class="btn-primary" id="kanji-load">Поиск</button>
+          <!-- hidden compat selects -->
+          <select id="kanji-jlpt-filter" style="display:none">
+            <option value="">Все уровни</option>
+            <option value="5">N5</option><option value="4">N4</option>
+            <option value="3">N3</option><option value="2">N2</option><option value="1">N1</option>
+          </select>
+          <select id="kanji-prog-filter" style="display:none">
+            <option value="">Все кандзи</option>
+            <option value="learned">Изучено</option>
+            <option value="favorite">Избранное</option>
+          </select>
+        </div>
+        <div class="filter-row">
+          <span class="pills-label">JLPT</span>
+          <button class="pill-btn" data-jlpt="5" id="kanji-pill-n5">N5</button>
+          <button class="pill-btn" data-jlpt="4" id="kanji-pill-n4">N4</button>
+          <button class="pill-btn" data-jlpt="3" id="kanji-pill-n3">N3</button>
+          <button class="pill-btn" data-jlpt="2" id="kanji-pill-n2">N2</button>
+          <button class="pill-btn" data-jlpt="1" id="kanji-pill-n1">N1</button>
+          <span class="filter-divider"></span>
+          <button class="prog-pill learned" id="kanji-pill-learned">📖 Изучено</button>
+          <button class="prog-pill" id="kanji-pill-fav">⭐ Избранное</button>
+        </div>
       </div>
       <div class="kanji-grid" id="kanji-grid"></div>
+      <div class="pagination" id="kanji-pagination"></div>
     </div>
   </section>
 
   <!-- ── Rules ──────────────────────────────────────────────────────────── -->
   <section class="page" id="sec-rules">
     <div class="page-content">
-      <div class="toolbar">
-        <select class="filter-sel" id="rules-jlpt-filter">
-          <option value="">Все уровни</option>
-          <option value="5">N5</option><option value="4">N4</option>
-          <option value="3">N3</option><option value="2">N2</option><option value="1">N1</option>
-        </select>
-        <button class="btn-primary" id="rules-load">Загрузить</button>
+      <div class="filter-bar">
+        <div class="filter-row">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
+            <input class="search-field" id="rules-search" type="search" placeholder="Поиск по правилам…"/>
+          </div>
+          <button class="btn-primary" id="rules-load">Загрузить</button>
+          <!-- hidden compat selects -->
+          <select id="rules-jlpt-filter" style="display:none">
+            <option value="">Все уровни</option>
+            <option value="5">N5</option><option value="4">N4</option>
+            <option value="3">N3</option><option value="2">N2</option><option value="1">N1</option>
+          </select>
+          <select id="rules-prog-filter" style="display:none">
+            <option value="">Все правила</option>
+            <option value="learned">Изучено</option>
+            <option value="favorite">Избранное</option>
+          </select>
+        </div>
+        <div class="filter-row">
+          <span class="pills-label">JLPT</span>
+          <button class="pill-btn" data-jlpt="5" id="rules-pill-n5">N5</button>
+          <button class="pill-btn" data-jlpt="4" id="rules-pill-n4">N4</button>
+          <button class="pill-btn" data-jlpt="3" id="rules-pill-n3">N3</button>
+          <button class="pill-btn" data-jlpt="2" id="rules-pill-n2">N2</button>
+          <button class="pill-btn" data-jlpt="1" id="rules-pill-n1">N1</button>
+          <span class="filter-divider"></span>
+          <button class="prog-pill learned" id="rules-pill-learned">📖 Изучено</button>
+          <button class="prog-pill" id="rules-pill-fav">⭐ Избранное</button>
+        </div>
       </div>
       <div id="rules-list"></div>
     </div>
   </section>
 
-  <!-- ── Import ─────────────────────────────────────────────────────────── -->
-  <section class="page" id="sec-import">
-    <div class="page-content">
-      <div class="import-panel">
-        <h2 class="section-title">Пакетный импорт слов</h2>
-        <p class="hint">Одно слово на строку, поля через <code>|</code>:</p>
-        <code class="hint-code">слово | чтение | романдзи | перевод | пример | JLPT | тег1,тег2</code>
-        <textarea class="import-area" id="words-import-area" rows="8"
-          placeholder="水 | みず | mizu | вода | 水を飲む | 5 | существительное
-食べる | たべる | taberu | есть | ご飯を食べる | 5 | глагол"></textarea>
-        <div class="import-actions">
-          <button class="btn-primary" id="words-import-btn">Импортировать слова</button>
-          <span class="import-status" id="words-import-status"></span>
-        </div>
-      </div>
+  <!-- ── Import (hidden, kept for batch import via modal) ──────────────── -->
+  <section class="page" id="sec-import" style="display:none"></section>
 
-      <div class="import-panel">
-        <h2 class="section-title">Пакетный импорт кандзи</h2>
-        <p class="hint">Один символ на строку:</p>
-        <code class="hint-code">символ | онъёми1,онъёми2 | кунъёми | значение | JLPT</code>
-        <textarea class="import-area" id="kanji-import-area" rows="6"
-          placeholder="水 | スイ | みず | вода | 5
-山 | サン,ザン | やま | гора | 5"></textarea>
-        <div class="import-actions">
-          <button class="btn-primary" id="kanji-import-btn">Импортировать кандзи</button>
-          <span class="import-status" id="kanji-import-status"></span>
+  <!-- ── Roadmap ──────────────────────────────────────────────────────────── -->
+  <section class="page" id="sec-roadmap">
+    <div class="page-content">
+      <div class="rm-header">
+        <div class="rm-title">道 Дорожная карта</div>
+        <div class="rm-subtitle">Последовательный путь от нуля до N4 — по урокам Minna no Nihongo и курсов Икигай</div>
+        <div class="rm-overall-row">
+          <div class="rm-overall-bar"><div class="rm-overall-fill" id="rm-overall-fill" style="width:0%"></div></div>
+          <span class="rm-overall-pct" id="rm-overall-pct">0 / 0 уроков</span>
         </div>
       </div>
+      <div id="rm-blocks"></div>
     </div>
   </section>
 
@@ -333,6 +626,95 @@
   </div>
 </div>
 
-<script src="/static/app.js?v=3"></script>
+<!-- ══ AUTH MODAL ════════════════════════════════════════════════════════════ -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-card">
+    <button class="auth-close" id="auth-close">✕</button>
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Войти</button>
+      <button class="auth-tab" data-tab="register">Регистрация</button>
+    </div>
+
+    <!-- Google -->
+    <a href="/api/auth/google" class="btn-google">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Войти через Google
+    </a>
+
+    <div class="auth-divider"><span>или</span></div>
+
+    <!-- Login form -->
+    <form class="auth-form" id="login-form" data-form="login">
+      <label>Email<input type="email" name="email" required placeholder="you@example.com"/></label>
+      <label>Пароль<input type="password" name="password" required placeholder="••••••"/></label>
+      <button type="submit" class="btn-primary">Войти</button>
+      <div class="auth-status" id="login-status"></div>
+    </form>
+
+    <!-- Register form -->
+    <form class="auth-form hidden" id="register-form" data-form="register">
+      <label>Имя<input type="text" name="display_name" placeholder="Иван"/></label>
+      <label>Email<input type="email" name="email" required placeholder="you@example.com"/></label>
+      <label>Пароль<input type="password" name="password" required placeholder="мин. 6 символов"/></label>
+      <button type="submit" class="btn-primary">Создать аккаунт</button>
+      <div class="auth-status" id="register-status"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ══ PROFILE MODAL ═════════════════════════════════════════════════════════ -->
+<div class="profile-overlay" id="profile-overlay">
+  <div class="profile-card">
+    <button class="profile-close" id="profile-close">✕</button>
+
+    <!-- ── Левая колонка: инфо пользователя ── -->
+    <div class="profile-left">
+      <div class="profile-avatar-wrap">
+        <img class="profile-avatar-img hidden" id="profile-avatar-img" src="" alt=""/>
+        <div class="profile-initials" id="profile-initials"></div>
+      </div>
+      <form class="profile-form" id="profile-form">
+        <label>Имя
+          <input type="text" name="display_name" id="profile-name-input" placeholder="Ваше имя"/>
+        </label>
+        <label>Email
+          <input type="email" name="email" id="profile-email-input" disabled placeholder="email@example.com"/>
+        </label>
+        <div class="profile-footer">
+          <button type="submit" class="btn-primary">Сохранить</button>
+          <span class="form-status" id="profile-status"></span>
+        </div>
+      </form>
+    </div>
+
+    <!-- ── Правая колонка: диаграмма + статистика + избранное ── -->
+    <div class="profile-right">
+      <div class="profile-radar-wrap hidden" id="profile-radar-wrap">
+        <canvas id="profile-radar-chart" width="275" height="275"></canvas>
+      </div>
+      <div class="profile-stats-grid">
+        <div class="pstat">
+          <div class="pstat-val" id="pstat-w-learned">—</div>
+          <div class="pstat-label">Слов изучено</div>
+        </div>
+        <div class="pstat">
+          <div class="pstat-val" id="pstat-k-learned">—</div>
+          <div class="pstat-label">Кандзи изучено</div>
+        </div>
+        <div class="pstat">
+          <div class="pstat-val" id="pstat-r-learned">—</div>
+          <div class="pstat-label">Грамматики изучено</div>
+        </div>
+      </div>
+      <button class="profile-fav-btn" id="profile-fav-btn">⭐ Перейти к избранному</button>
+    </div>
+
+  </div>
+</div>
+
+<script src="/static/roadmap-data.js?v=5"></script>
+<script src="/static/app.js?v=40"></script>
 </body>
 </html>
