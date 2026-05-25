@@ -1,0 +1,41 @@
+{
+  "name": "nihongo-no-web",
+  "version": "1.0.0",
+  "description": "Nihongo no Web — Japanese learning app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder build --win --x64"
+  },
+  "build": {
+    "appId": "com.nihongo.web",
+    "productName": "Nihongo no Web",
+    "win": {
+      "target": "portable",
+      "signAndEditExecutable": false,
+      "sign": null
+    },
+    "files": [
+      "main.js",
+      "preload.js"
+    ],
+    "extraResources": [
+      {
+        "from": "../",
+        "to": "app",
+        "filter": [
+          "**/*",
+          "!electron/**",
+          "!.venv/**",
+          "!**/__pycache__/**",
+          "!*.pyc",
+          "!.git/**"
+        ]
+      }
+    ]
+  },
+  "devDependencies": {
+    "electron": "^35.7.5",
+    "electron-builder": "^25.1.8"
+  }
+}
