@@ -48,6 +48,16 @@ CREATE TABLE IF NOT EXISTS rules (
     created_at  TEXT DEFAULT (datetime('now'))
 );
 
+CREATE TABLE IF NOT EXISTS users (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    email        TEXT    NOT NULL UNIQUE,
+    hashed_pw    TEXT,
+    display_name TEXT    NOT NULL DEFAULT '',
+    google_id    TEXT    UNIQUE,
+    avatar_url   TEXT    DEFAULT '',
+    created_at   TEXT    DEFAULT (datetime('now'))
+);
+
 CREATE INDEX IF NOT EXISTS idx_words_jlpt      ON words (jlpt_level);
 CREATE INDEX IF NOT EXISTS idx_words_type      ON words (word_type);
 CREATE INDEX IF NOT EXISTS idx_words_sub       ON words (subcategory);
