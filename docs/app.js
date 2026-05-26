@@ -608,8 +608,8 @@ function bindKanjiEvents(container, onDelete) {
         ? (newVal ? "Изучено ✓" : "Отметить как изученное")
         : (newVal ? "В избранном ✓" : "В избранное");
       _kanjiProgress[id] = { ...kProg(id), [field]: newVal };
-      await api(`/progress/kanji/${id}`, "PUT", { [field]: newVal });
       updateKanjiCardEl(id);
+      await api(`/progress/kanji/${id}`, "PUT", { [field]: newVal });
     })
   );
 }

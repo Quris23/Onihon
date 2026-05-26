@@ -58,6 +58,34 @@ CREATE TABLE IF NOT EXISTS users (
     created_at   TEXT    DEFAULT (datetime('now'))
 );
 
+CREATE TABLE IF NOT EXISTS word_progress (
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    word_id    INTEGER NOT NULL REFERENCES words(id) ON DELETE CASCADE,
+    status     TEXT    DEFAULT 'new' CHECK(status IN ('new','learning','known')),
+    learned    INTEGER DEFAULT 0,
+    favorite   INTEGER DEFAULT 0,
+    updated_at TEXT    DEFAULT (datetime('now')),
+    PRIMARY KEY (user_id, word_id)
+);
+
+CREATE TABLE IF NOT EXISTS kanji_progress (
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    kanji_id   INTEGER NOT NULL REFERENCES kanji(id) ON DELETE CASCADE,
+    learned    INTEGER DEFAULT 0,
+    favorite   INTEGER DEFAULT 0,
+    updated_at TEXT    DEFAULT (datetime('now')),
+    PRIMARY KEY (user_id, kanji_id)
+);
+
+CREATE TABLE IF NOT EXISTS rule_progress (
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    rule_id    INTEGER NOT NULL REFERENCES rules(id) ON DELETE CASCADE,
+    learned    INTEGER DEFAULT 0,
+    favorite   INTEGER DEFAULT 0,
+    updated_at TEXT    DEFAULT (datetime('now')),
+    PRIMARY KEY (user_id, rule_id)
+);
+
 CREATE INDEX IF NOT EXISTS idx_words_jlpt      ON words (jlpt_level);
 CREATE INDEX IF NOT EXISTS idx_words_type      ON words (word_type);
 CREATE INDEX IF NOT EXISTS idx_words_sub       ON words (subcategory);

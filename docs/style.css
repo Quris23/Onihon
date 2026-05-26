@@ -681,7 +681,17 @@ body::before {
 .kanji-card.kc-learned .kc-meaning { color: #111; }
 .kanji-card.kc-learned .badge-jlpt { background: rgba(0,0,0,.08); color: #333; border-color: rgba(0,0,0,.12); }
 
-.kanji-card.kc-favorite { border: 1.5px solid #d4af37 !important; }
+.kanji-card.kc-favorite { box-shadow: 0 0 0 2px #d4af37 !important; }
+
+/* Light theme: unlearned = white, learned = red */
+[data-theme="light"] .kanji-card.kc-not-learned { background: #fff; border-color: #ddd; }
+[data-theme="light"] .kanji-card.kc-not-learned .kc-char,
+[data-theme="light"] .kanji-card.kc-not-learned .kc-meaning { color: #111; }
+[data-theme="light"] .kanji-card.kc-not-learned .badge-jlpt { background: rgba(0,0,0,.08); color: #333; border-color: rgba(0,0,0,.12); }
+[data-theme="light"] .kanji-card.kc-learned { background: var(--red); border-color: var(--red); }
+[data-theme="light"] .kanji-card.kc-learned .kc-char,
+[data-theme="light"] .kanji-card.kc-learned .kc-meaning { color: #fff; }
+[data-theme="light"] .kanji-card.kc-learned .badge-jlpt { background: rgba(255,255,255,.2); color: #fff; border-color: rgba(255,255,255,.3); }
 
 .kc-char {
   font-family: var(--font-ja);

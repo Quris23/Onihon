@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import pathlib
 
 from database import init_db
-from routers import words, kanji, rules, auth
+from routers import words, kanji, rules, auth, progress
 
 
 @asynccontextmanager
@@ -27,7 +27,8 @@ app.add_middleware(
 app.include_router(words.router,  prefix="/api")
 app.include_router(kanji.router,  prefix="/api")
 app.include_router(rules.router,  prefix="/api")
-app.include_router(auth.router,   prefix="/api")
+app.include_router(auth.router,     prefix="/api")
+app.include_router(progress.router, prefix="/api")
 
 _fe = pathlib.Path(__file__).parent / "docs"
 app.mount("/", StaticFiles(directory=str(_fe), html=True), name="static")
